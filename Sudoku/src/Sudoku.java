@@ -17,6 +17,7 @@ public class Sudoku {
 		//Find available numbers
 		Byte[] AvailableNumbers = getAvailableNumbers(col, line);
 		
+		
 		//Find next coordinates
 		int nextCol = col;
 		int nextLine = line;
