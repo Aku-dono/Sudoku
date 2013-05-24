@@ -35,7 +35,7 @@ public class Sudoku {
 			_Sudoku[col][line] = b; //Set the value
 			if(nextLine == 9) //We've reached the end, final number has been set! 
 				return true; 
-			return setNumber(nextCol, nextLine); //set the next one in line. 
+			setNumber(nextCol, nextLine); //set the next one in line. 
 		}
 		return false;
 	}
