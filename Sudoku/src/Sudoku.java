@@ -14,9 +14,14 @@ public class Sudoku {
 
 	private static boolean setNumber(int col, int line)
 	{
+		if(col == 0 && line == 0 && !isAvailable(col, line)) //SPECIAL CASE if the first case is occupied! 
+		{
+			col++;
+		}
+		
 		//Find available numbers
 		Byte[] AvailableNumbers = getAvailableNumbers(col, line);
-
+		
 
 		//Find next coordinates
 		int nextCol = col;
@@ -43,7 +48,7 @@ public class Sudoku {
 			if(b == null)
 				continue;
 			//System.out.println("testing " + b + " at " + "[" + col + "][" + line + "]");
-			_Sudoku[col][line] = b; //Set the value
+				_Sudoku[col][line] = b; //Set the value
 			if(nextLine == 9) //We've reached the end, final number has been set! 
 				return true; 
 			if(setNumber(nextCol, nextLine))//set the next one in line.

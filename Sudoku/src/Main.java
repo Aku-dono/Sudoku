@@ -59,8 +59,8 @@ public class Main {
 				if(Sudoku.Solve(SudokuMatrix))
 				{
 					long endTime = System.nanoTime();
-					long duration = endTime - startTime;
-					System.out.println("Solution found in " + duration + " nanoseconds");
+					float duration = (endTime - startTime) / 1000000f;
+					System.out.println("Solution found in " + duration + " milliseconds");
 
 					printSudoku(SudokuMatrix);
 				}
