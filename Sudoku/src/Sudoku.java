@@ -5,52 +5,50 @@ import java.util.ArrayList;
 
 public class Sudoku {
 	private static byte[][] _Sudoku; 
+	private static int setNumberCount;
 
 	public static boolean Solve(byte[][] Sudoku)
 	{
+		setNumberCount = 0;
 		_Sudoku = Sudoku; //Because this is a reference, it modifies the original object. So there's no need to access _Sudoku. 
 		return setNumber(0, 0);
+	}
+	
+	public static int getAttempts()
+	{
+		return setNumberCount;
 	}
 
 	private static boolean setNumber(int col, int line)
 	{
-		if(col == 0 && line == 0 && !isAvailable(col, line)) //SPECIAL CASE if the first case is occupied! 
+		setNumberCount++;
+		while(!isAvailable(col, line))
 		{
-			col++;
+			col = ++col % 9;
+			if(col == 0)
+				line++;
+			if(line == 9) //Last number reached! 
+				return true;
 		}
-		
+
 		//Find available numbers
 		Byte[] AvailableNumbers = getAvailableNumbers(col, line);
-		
 
-		//Find next coordinates
-		int nextCol = col;
+		//Next coordinates
+		int nextCol = (col + 1) % 9;
 		int nextLine = line;
-
-		do{ //Used a do while, since we're always at least incrementing by one. 
-			nextCol = (++nextCol) % 9; //Switch to next column
-			if(nextCol == 0) //If we were at column 9, the next coordinates are [0][line+1]
-				nextLine++;
-		} while(nextLine < 9 && !isAvailable(nextCol, nextLine)); //Next case might not be empty, in which case it should be skipped! 
+		if(nextCol == 0)
+			nextLine++;
 		
-		//DEBUG
-		/*String strAvNum = "[";
-		for(Byte b : AvailableNumbers)
-		{
-			strAvNum += b + ", ";
-		}
-		strAvNum += "]";
-		System.out.println("Available numbers for " + col + ", " + line + ": " + strAvNum);*/
-		
-		
+		//Main assignation loop
 		for(Byte b : AvailableNumbers)
 		{
 			if(b == null)
 				continue;
 			//System.out.println("testing " + b + " at " + "[" + col + "][" + line + "]");
-				_Sudoku[col][line] = b; //Set the value
-			if(nextLine == 9) //We've reached the end, final number has been set! 
-				return true; 
+			_Sudoku[col][line] = b; //Set the value
+			if(nextLine == 9) //Last number reached! 
+				return true;
 			if(setNumber(nextCol, nextLine))//set the next one in line.
 				return true;  //If setNumber managed to fit the last number in, go back all the way to the first with success. 
 		}
@@ -77,6 +75,7 @@ public class Sudoku {
 			//First round, it'll remove [i][line] (IE: the first element of the list) from the array: position 0. null => null 
 			//Second round, it'll remove [i][line] from the array, position 1. 1 => null; the number is unavailable. 
 			//Third round, same logic; remove [5], so 5 => null. ETC ETC. Does this simultaneously for line and column. 
+			//Empty cases have 0, so they remove from 0, which is always null. 
 		}
 		//Next is block. 
 		int startCol = (col / 3) * 3; //5 / 3 = 1, *3 = 3

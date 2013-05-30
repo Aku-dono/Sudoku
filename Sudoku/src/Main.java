@@ -60,24 +60,25 @@ public class Main {
 				{
 					long endTime = System.nanoTime();
 					float duration = (endTime - startTime) / 1000000f;
-					System.out.println("Solution found in " + duration + " milliseconds");
-
+					System.out.println("Solution found in " + duration + " milliseconds.");
 					printSudoku(SudokuMatrix);
 				}
 				else
 					System.out.println("No solution found.");
+				System.out.println("Algorythm went through " + Sudoku.getAttempts() + " cycles.");
+				System.out.println("-----------------------");
 			}}
 	}
 
 
 	private static void printSudoku(byte[][] Sudoku)
 	{
-		for(byte[] line : Sudoku)
+		for(int line = 0; line < 9; line++)
 		{
 			System.out.print('[');
-			for(byte b : line)
+			for(int col = 0; col < 9; col++)
 			{
-				System.out.print(b + " ");
+				System.out.print(Sudoku[col][line] + " ");
 			}
 			System.out.print("]\n");
 			System.out.flush();
