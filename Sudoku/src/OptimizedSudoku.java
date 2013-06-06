@@ -1,29 +1,56 @@
-import java.util.ArrayList;
+import java.util.TreeSet;
 
-
-
-
-public class Sudoku {
-	private static byte[][] _Sudoku; 
-	private static int setNumberCount;
-
-	public static boolean Solve(byte[][] Sudoku)
+public class OptimizedSudoku {
+	private static class Coordinates implements Comparable<Coordinates>
 	{
-		setNumberCount = 0;
-		_Sudoku = Sudoku; //Because this is a reference, it modifies the original object. So there's no need to access _Sudoku. 
-		
-		int col = 0; 
-		int line = 0;
-		while(!isAvailable(col, line)) //get first empty number
+		private int _line;
+		private int _col;
+		private int _frequency;
+				
+		public Coordinates(int line, int col, int frequency)
 		{
-			col = (col + 1) % 9;
-			if(col == 0)
-				line++;
-			if(line == 9) //Last number reached! Somehow, Sudoku was already complete. 
-				return true;
+			_line = line;
+			_col = col;
+			_frequency = frequency;
 		}
 		
-		return setNumber(col, line);
+		@Override
+		public int compareTo(Coordinates o) {
+			return this._frequency >= o._frequency ? 1:-1;
+		}
+	}
+	
+	
+	private static byte[][] _Sudoku; 
+	private static int setNumberCount;
+	private static Coordinates[] emptyNumbers;
+	
+	public static boolean Solve(byte[][] Sudoku)
+	{
+		_Sudoku = Sudoku; //Because this is a reference, it modifies the original object. So there's no need to access _Sudoku. 
+		setNumberCount = 0;
+		emptyNumbers = new Coordinates[0];
+		
+		//Fill the list of empty numbers. 
+		TreeSet<Coordinates> emptyNumbersTree = new TreeSet<Coordinates>();
+		for(int line = 0; line < 9; line++)
+			for(int col = 0; col < 9; col++)
+			{
+				if(isAvailable(col, line))
+				{
+					int frequency = 0;
+					Byte[] availableNumbers = getAvailableNumbers(col, line);
+					for(Byte b : availableNumbers)
+					{
+						if(b != null)
+							frequency++;
+					}
+					//System.out.println("Adding coordinates " + col + ", " + line + " with frequency " + frequency);
+					emptyNumbersTree.add(new Coordinates(line, col, frequency));
+				}
+			}
+		emptyNumbers = emptyNumbersTree.toArray(emptyNumbers);
+		return setNumber(0);
 	}
 	
 	public static int getAttempts()
@@ -31,18 +58,18 @@ public class Sudoku {
 		return setNumberCount;
 	}
 
-	private static boolean setNumber(int col, int line)
+	private static boolean setNumber(int id)
 	{
+		if(id >= emptyNumbers.length) //last number is assigned!
+			return true;
+		Coordinates currentCoord = emptyNumbers[id];
+		
+		//System.out.println("Testing: frequency is " + currentCoord._frequency);
+		int col = currentCoord._col, line = currentCoord._line;
 		setNumberCount++;
 		
 		//Find available numbers
 		Byte[] AvailableNumbers = getAvailableNumbers(col, line);
-
-		//Next coordinates
-		int nextCol = (col + 1) % 9;
-		int nextLine = line;
-		if(nextCol == 0)
-			nextLine++;
 		
 		//Main assignation loop
 		for(Byte b : AvailableNumbers)
@@ -51,9 +78,7 @@ public class Sudoku {
 				continue;
 			//System.out.println("testing " + b + " at " + "[" + col + "][" + line + "]");
 			_Sudoku[col][line] = b; //Set the value
-			if(nextLine == 9) //Last number reached! 
-				return true;
-			if(setNumber(nextCol, nextLine))//set the next one in line.
+			if(setNumber(id + 1))//set the next one in line.
 				return true;  //If setNumber managed to fit the last number in, go back all the way to the first with success. 
 		}
 		_Sudoku[col][line] = 0; //Backing up. 
